@@ -1,0 +1,205 @@
+# HARM Pipeline — Unified Configuration
+# =====================================================================
+# The pipeline runs in two phases, selected with the CLI flag
+# `--phase eval|final`:
+#
+#   phase = eval   (default)  model development
+#     training years 2000-2016, held-out evaluation 2017-2018,
+#     Optuna hyperparameter tuning, results under ./results/eval/
+#
+#   phase = final             final retrain + prediction
+#     training years 2000-2018 using best-params from the eval run,
+#     prediction over 2019-2024, results under ./results/final/
+#
+# Shared sections (paths, crops, features, layer configs) apply to both
+# phases; phase-specific values are under `phases.{eval|final}`.
+# =====================================================================
+
+# ── Paths (shared across phases) ──
+# All paths are relative to the 05_harm_model/ directory.
+paths:
+  # Training data from 04_dataset_preparation (9-region default)
+  data_root:         "../04_dataset_preparation/data/train"
+  # 30-region Köppen variant for wh/mai
+  data_root_koppen:  "./data/train_koppen"
+  # Prediction data from 04_dataset_preparation
+  pred_data_root:    "../04_dataset_preparation/data/predict"
+  pred_data_root_koppen: "./data/predict_koppen"
+  # Supporting reference / filtering resources
+  hist_data_root:    "../04_dataset_preparation/data/train"
+  harvest_area_dir:  "./data/harvest_area"
+  spam_2020_dir:     "./data/spam_2020"
+  country_shapefile: "./data/reference/ne_10m_admin_0_countries.shp"
+  koppen_nc:         "./data/reference/koppen_geiger_5arcmin.nc"
+
+# ── Phase-specific configuration ──
+phases:
+  eval:
+    result_root:             "./results/eval"
+    train_start:             2000
+    train_end:               2016
+    eval_start:              2017
+    eval_end:                2018
+    global_tuning_method:    optuna
+    include_config_comparison: true
+    save_latex:              true
+
+  final:
+    result_root:             "./results/final"
+    train_start:             2000
+    train_end:               2018
+    # eval_start/end still required for code paths; the "eval" window in
+    # final-phase is placeholder and does not drive any reporting
+    eval_start:              2019
+    eval_end:                2019
+    global_tuning_method:    fixed
+    include_config_comparison: false
+    save_latex:              false
+
+# ── Crops ──
+# Crop strategy constants (ALL_CROPS, WEIGHTED_CROPS, KOPPEN_CROPS) are
+# defined in harm/constants.py — the single source of truth. Use
+# `run_list` to restrict each invocation to a subset.
+crops:
+  run_list: ['wh']
+
+# ── Run control ──
+run:
+  layers:        ['global']       # one or more of: global, regional, extreme
+  run_eval:      true
+  run_predict:   false
+  force_rerun:   false
+
+# ── Validation (shared) ──
+validation:
+  mode: 'fixed'                   # 'fixed' or 'rolling'
+  rolling:
+    train_start:      2000
+    first_eval_start: 2015
+    eval_window:      2
+    n_splits:         3
+  # Final-phase retrain/prediction window
+  retrain_start:  2000
+  retrain_end:    2018
+  pred_start:     2019
+  pred_end:       2024
+
+# ── Common ──
+common:
+  random_state: 42
+  use_gpu:      true
+  quantiles:    [0.1, 0.5, 0.9]
+
+# ── Features ──
+features:
+  exclude_columns:
+    - 'time'
+    - 'date'
+    - 'grid50_id'
+    - 'regiontype'
+    - 'VI_Quality'
+    - 'crop'
+  time_config:
+    default: 'cyclical_only'
+    overrides:
+      mil: 'minimal_cyclical'
+    drops:
+      cyclical_only:     ['year', 'day_of_year', 'decade']
+      minimal_cyclical:  ['year', 'day_of_year', 'decade', 'cos_doy', 'sin_doy']
+
+# ── Global layer ──
+global_layer:
+  # tuning_method is overridden by phases.{eval|final}.global_tuning_method
+  n_trials:         20
+  n_inner_folds:    3
+  n_repeats:        1
+  test_months:      24
+  min_train_months: 12
+  fixed_params:
+    n_estimators:     150
+    max_depth:        8
+    learning_rate:    0.1
+    subsample:        0.9
+    colsample_bytree: 0.9
+    min_child_weight: 3
+    reg_alpha:        0.1
+    reg_lambda:       1.0
+  sample_weight:
+    enabled:            false
+    alpha:              1.0
+    reference_quantile: 0.9
+    max_weight:         10.0
+
+# ── Regional layer ──
+regional_layer:
+  min_samples:              5000
+  min_samples_for_training: 100
+  improvement_threshold:    2.0
+  n_temporal_splits:        3
+  n_spatial_folds:          5
+  n_inner_folds:            3
+  test_months:              24
+  min_train_months:         12
+  param_grid:
+    max_depth:    [3, 4, 5]
+    n_estimators: [80, 100, 120]
+    reg_lambda:   [1.0, 2.0, 3.0]
+  fixed_params:
+    learning_rate:    0.1
+    subsample:        0.8
+    colsample_bytree: 0.8
+    min_child_weight: 5
+    reg_alpha:        0.5
+
+# ── Extreme layer ──
+extreme_layer:
+  min_samples:                 5000
+  min_extreme_samples:         100
+  min_base_r2:                 0.0
+  ytrue_percentile:            85
+  underestimate_threshold:     0.15
+  detector_prob_threshold:     0.6
+  max_correction_sample_ratio: 0.05
+  max_relative_correction:     0.5
+  min_relative_correction:     -0.5
+  enable_conservation:         true
+  conservation_tolerance:      0.05
+  max_rmse_degradation_pct:    5.0
+  max_conservation_deviation:  0.10
+  test_months:                 24
+  min_train_months:            12
+  n_cv_folds:                  3
+  detector_param_grid:
+    max_depth:    [3, 4]
+    n_estimators: [50, 100]
+  detector_fixed_params:
+    learning_rate:    0.1
+    subsample:        0.8
+    colsample_bytree: 0.8
+    min_child_weight: 5
+    reg_alpha:        0.3
+    reg_lambda:       1.0
+  corrector_param_grid:
+    max_depth:    [2, 3]
+    n_estimators: [30, 50]
+    reg_lambda:   [3.0, 5.0]
+  corrector_fixed_params:
+    learning_rate:    0.05
+    subsample:        0.8
+    colsample_bytree: 0.8
+    min_child_weight: 5
+    reg_alpha:        1.0
+
+# ── Evaluation (shared metrics; phase controls the report options) ──
+evaluation:
+  extreme_percentile: 95
+
+# ── Plotting ──
+plotting:
+  figsize: [14, 6]
+  dpi:     150
+  show_uncertainty: true
+  colors:
+    actual:      'blue'
+    prediction:  'red'
+    uncertainty: 'lightcoral'

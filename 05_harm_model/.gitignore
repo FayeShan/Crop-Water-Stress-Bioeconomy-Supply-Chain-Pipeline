@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+
+# macOS
+__MACOSX/
+.DS_Store
+
+# Data & results (too large for git)
+data/
+results/
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp

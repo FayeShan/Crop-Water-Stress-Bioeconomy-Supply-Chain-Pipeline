@@ -1,0 +1,32 @@
+general:
+  log_dir: "./logs"
+  log_level: "INFO"
+
+# Input: monthly water-footprint NC files (ACEA blue-water, irrigated)
+# File pattern: acea_5arc_{crop}_wfp_blue_ir_global_monthly_{YYYY}_{YYYY}.nc
+wf:
+  input_dir: "./wf"
+  filename_regex: "acea_5arc_(\\w+)_wfp_blue_ir"   # captures crop code (wh, mai, ri1, …)
+  variable: "wfp_blue_ir"
+
+# AWARE characterization factors (pre-gridded monthly weights)
+# The shipped file aware_gridcell.nc was built from AWARE.xlsx +
+# Placemarks_Data.csv (see src/build_aware_grid.py for the one-time
+# generation code, kept commented for reference).
+aware:
+  weights_nc: "./aware/aware_gridcell.nc"
+  weights_variable: "monthly_weight"
+  # Files used by the (one-time) Stage-1 generation step
+  excel: "./aware/AWARE.xlsx"
+  placemarks_csv: "./aware/Placemarks_Data.csv"
+  merged_csv: "./aware/AWARE_with_geo.csv"
+
+# Output: per-crop, per-year water-stress NC files
+#   ./waterstress/{crop}/{year}.nc  (variable: waterstress)
+output:
+  waterstress_dir: "./waterstress"
+  compression_level: 5
+
+date_range:
+  start_year: null   # e.g. 1990
+  end_year: null     # e.g. 2024

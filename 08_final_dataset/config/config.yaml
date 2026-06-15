@@ -1,0 +1,39 @@
+# 08_final_dataset — Configuration
+# ==========================================================
+# Stage 8 of the end-to-end HARM water-stress pipeline.
+# Packages the HARM predictions into the published gridded
+# dataset (NetCDF + GeoTIFF + country CSV) for the Zenodo
+# release and the Google Earth Engine dashboard.
+# All paths are relative to this folder (08_final_dataset/).
+
+general:
+  log_dir: "./logs"
+  log_level: "INFO"
+
+input:
+  # Flat per-crop {crop}.csv (time, lat, lon, year, y_pred) from
+  # Stage 05 `python main.py export-predictions`.
+  predictions_dir: "../05_harm_model/results/final/predictions_csv"
+  # Any 5-arcmin NetCDF on the target grid (used only for lat/lon).
+  reference_grid_nc: "../01_data_acquisition/data/reference/2002.nc"
+  # Country boundaries for the country-level CSV aggregation.
+  shapefile: "../06_gloria_mapping/country_shape/ne_10m_admin_0_countries.shp"
+
+output:
+  netcdf_monthly_dir: "./final_dataset/netcdf/monthly"
+  netcdf_yearly_dir:  "./final_dataset/netcdf/yearly"
+  geotiff_monthly_dir: "./final_dataset/geotiff/monthly"
+  geotiff_yearly_dir:  "./final_dataset/geotiff/yearly"
+  csv_dir:            "./final_dataset/csv"
+
+# Years built from the HARM predictions (the historical 1990-2018 grids
+# come from the physical reference; see README).
+years:
+  start: 2019
+  end: 2024
+
+netcdf:
+  # zlib compression level for the recompress step
+  compression_level: 4
+  # files smaller than this (MB) are treated as already compressed
+  recompress_skip_threshold_mb: 500

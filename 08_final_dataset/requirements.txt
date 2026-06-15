@@ -1,0 +1,10 @@
+numpy
+pandas
+xarray
+netCDF4
+scipy
+rasterio
+geopandas
+shapely
+tqdm
+pyyaml

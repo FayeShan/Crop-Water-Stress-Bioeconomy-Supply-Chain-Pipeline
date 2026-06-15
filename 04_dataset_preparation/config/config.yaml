@@ -1,0 +1,94 @@
+general:
+  log_dir: "./logs"
+  log_level: "INFO"
+
+# Output of 02_water_stress_computation pipeline (target variable).
+#   structure: {ws_dir}/{crop}/{year}.nc  var: waterstress
+water_stress:
+  ws_dir: "../02_water_stress_computation/waterstress"
+
+# Output of 01_data_acquisition predictor merge step.
+#   structure: {merged_dir}/{year}_merged.nc (contains ERA5+MODIS+SMIA+TWSA)
+predictors:
+  merged_dir: "../01_data_acquisition/data/merged"
+
+# Output of 03_iha_computation (monthly + aggregate HA).
+iha:
+  monthly_dir: "../03_iha_computation/monthly"          # {acea}_{year}.nc
+  annual_dir: "../03_iha_computation/annual"            # {acea}.nc (oac/pec/pdc)
+
+# Reference look-up files (generated or user-supplied).
+reference:
+  dir: "./reference"
+  cropmasks_dir: "./reference/cropmasks"          # from setup-cropmask
+  coarse50km_gridid: "./reference/coarse50km_gridid.parquet"  # from setup-coarse-grid
+  region9: "./reference/region9.parquet"          # from setup-region9
+  # Template NC for setup-coarse-grid and setup-region9
+  template_nc: "../01_data_acquisition/data/reference/2002.nc"
+
+# NOAA indices (monthly climate oscillation indicators).
+noaa:
+  dir: "./noaa"                                   # *.csv files
+
+# Parquet I/O.
+data:
+  base_train_dir: "./data/base_train"             # from build-train
+  base_predict_dir: "./data/base_predict"         # from build-predict
+  train_dir: "./data/train"                       # from feature-engineering --mode train
+  predict_dir: "./data/predict"                   # from feature-engineering --mode predict
+
+# Year ranges.
+date_range:
+  train_start: 2000
+  train_end: 2019
+  predict_start: 2019
+  predict_end: 2024
+
+# Crops.
+crops:
+  all: [
+    "aff", "bar", "bea", "cas", "ckp", "coc", "cof", "cot", "cwp",
+    "mai", "mil", "nut", "oac", "pdc", "pec", "plm", "pot", "rap",
+    "ri1", "ri2", "sgb", "sgc", "sor", "soy", "sun", "vgt", "wh",
+  ]
+  # Aggregate crops use annual HA NC (oac/pec/pdc); the rest use monthly.
+  aggregate: ["oac", "pec", "pdc"]
+
+# Predictor variables copied out of the merged NC into BASE parquets.
+predictor_vars:
+  - d2m
+  - t2m
+  - swvl1
+  - ssr
+  - ssrd
+  - evabs
+  - evavt
+  - ro
+  - u10
+  - v10
+  - sp
+  - tp
+  - NDVI
+  - EVI_std_dev
+  - pixel_reliability
+  - EVI
+  - VI_Quality
+  - red_reflectance
+  - NIR_reflectance
+  - blue_reflectance
+  - MIR_reflectance
+  - NDVI_std_dev
+  - smia_01
+  - smia_11
+  - smia_21
+  - twsan
+
+# Feature engineering config.
+feature_engineering:
+  lag_vars: ["evabs", "swvl1", "sp", "v10", "NDVI", "NIR_reflectance", "EVI"]
+  lag_range: [1, 2, 3]
+  roll_vars: ["t2m", "d2m", "evabs", "v10", "swvl1", "ssr", "NDVI", "twsan", "EVI"]
+  roll_windows: [3]
+  # For the predict set, prepend these years from base_train so early-year
+  # lag/rolling features are correct, then trim.
+  prepend_years_from_train: [2018, 2019]

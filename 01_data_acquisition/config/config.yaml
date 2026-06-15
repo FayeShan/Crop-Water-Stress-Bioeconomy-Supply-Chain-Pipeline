@@ -1,0 +1,160 @@
+# General Settings
+general:
+  working_dir: "./data"
+  log_dir: "./logs"
+  log_level: "INFO"
+
+# Date Range Settings
+date_range:
+  train_start: 1990
+  train_end: 2018
+  predict_start: 2019
+  predict_end: 2025
+
+# ERA5 Configuration
+era5:
+  output_dir: "./data/era5/raw"
+  processed_dir: "./data/era5/processed"
+  resampled_dir: "./data/era5/resampled"
+  variables:
+    - "2m_dewpoint_temperature"
+    - "2m_temperature"
+    - "volumetric_soil_water_layer_1"
+    - "surface_net_solar_radiation"
+    - "surface_solar_radiation_downwards"
+    - "evaporation_from_bare_soil"
+    - "evaporation_from_vegetation_transpiration"
+    - "runoff"
+    - "10m_u_component_of_wind"
+    - "10m_v_component_of_wind"
+    - "surface_pressure"
+    - "total_precipitation"
+  months:
+    - "01"
+    - "02"
+    - "03"
+    - "04"
+    - "05"
+    - "06"
+    - "07"
+    - "08"
+    - "09"
+    - "10"
+    - "11"
+    - "12"
+
+# MODIS Configuration
+modis:
+  raw_dir: "./data/modis/hdf"
+  nc_dir: "./data/modis/nc"
+  resampled_dir: "./data/modis/resampled"
+  start_year: 2000  # MODIS data starts from 2000
+  
+  # Earthaccess settings (login via: earthaccess.login())
+  short_name: "MOD13C2"
+  version: "061"
+  
+  # Fill value for masking invalid data
+  fill_value: -3000
+  
+  # Variable mapping: original name -> output name
+  # Comment out variables you don't need
+  var_mapping:
+    "CMG 0.05 Deg Monthly NDVI": "NDVI"
+    "CMG 0.05 Deg Monthly EVI": "EVI"
+    "CMG 0.05 Deg Monthly pixel reliability": "pixel_reliability"
+    "CMG 0.05 Deg Monthly red reflectance": "red_reflectance"
+    "CMG 0.05 Deg Monthly NIR reflectance": "NIR_reflectance"
+    "CMG 0.05 Deg Monthly blue reflectance": "blue_reflectance"
+    "CMG 0.05 Deg Monthly MIR reflectance": "MIR_reflectance"
+    "CMG 0.05 Deg Monthly NDVI std dev": "NDVI_std_dev"
+    "CMG 0.05 Deg Monthly VI Quality": "VI_Quality"
+    "CMG 0.05 Deg Monthly EVI std dev": "EVI_std_dev"
+  
+  # Optional: specify which variables to process (use output names)
+  # If empty or not set, all variables in var_mapping will be processed
+  # Example: ["NDVI", "EVI"]
+  selected_vars: ["NDVI"]
+
+
+# MODIS MOD09CMG - Green band (Band 4) monthly mean from daily reflectance
+modis_green:
+  raw_dir: "./data/modis_green/hdf"
+  nc_dir: "./data/modis_green/nc"
+  resampled_dir: "./data/modis_green/resampled"
+  start_year: 2000  # MOD09CMG starts from Feb 2000
+  keep_hdf: false
+
+# MODIS MCD12Q2 - Land Cover Dynamics (phenology), yearly
+modis_landcover:
+  raw_dir: "./data/modis_landcover/hdf"
+  nc_dir: "./data/modis_landcover/nc"
+  resampled_dir: "./data/modis_landcover/resampled"
+  start_year: 2001  # MCD12Q2 starts from 2001
+  keep_hdf: false
+
+# MODIS MCD12C1 - Land Cover Type (IGBP classification), yearly
+modis_landuse:
+  raw_dir: "./data/modis_landuse/hdf"
+  nc_dir: "./data/modis_landuse/nc"
+  resampled_dir: "./data/modis_landuse/resampled"
+  start_year: 2001  # MCD12C1 starts from 2001
+  keep_hdf: false
+
+
+# you can download SMIA, TWSA through the url:
+# https://drought.emergency.copernicus.eu/tumbo/gdo/download/
+
+# SMIA Configuration
+smia:
+  input_dir: "./data/smia/raw"
+  output_dir: "./data/smia/processed"
+  resampled_dir: "./data/smia/resampled"
+  days:
+    - "01"
+    - "11"
+    - "21"
+
+# TWSA Configuration
+twsa:
+  input_dir: "./data/twsa/raw"
+  output_dir: "./data/twsa/processed"  # This is where twsa-resample saves files
+  start_year: 2002  # TWSA data starts from 2002
+
+# Resampling Configuration
+resampling:
+  # Reference grid for resampling. Supports:
+  # - NetCDF file path: "./data/reference/grid.nc"
+  # - GeoTIFF file path: "./data/reference/grid.tif"
+  # - Resolution value: "0.05" (generates global grid at 0.05° resolution)
+  # reference_grid: "./data/reference/reference_grid.nc"
+  # reference_grid: "./data/reference/crops_impact_2001.tif"
+  reference_grid: "./data/reference/2002.nc"
+  method: "linear"  # Interpolation method: linear, nearest
+
+# Merge Configuration
+merge:
+  output_dir: "./data/merged"
+  compression_level: 6
+  
+  # Data sources to merge (set to true/false to include/exclude)
+  sources:
+    era5: true
+    modis: true
+    smia: true
+    twsa: true
+    # Additional MODIS products (opt-in, require separate download)
+    modis_green: false       # MOD09CMG Green reflectance (monthly)
+    modis_landcover: false   # MCD12Q2 phenology (yearly, broadcast to monthly)
+    modis_landuse: false     # MCD12C1 IGBP (yearly, broadcast to monthly)
+  
+  # Extra files to merge (optional, provide full paths)
+  # Example: ["./data/extra/soil_data.nc", "./data/extra/elevation.nc"]
+  extra_files: []
+
+# NetCDF Encoding
+encoding:
+  dtype: "float32"
+  fill_value: -9999.0
+  zlib: true
+  complevel: 5

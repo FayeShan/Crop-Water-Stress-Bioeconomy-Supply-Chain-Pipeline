@@ -1,0 +1,8 @@
+# iHA Pipeline Requirements
+xarray>=2023.0.0
+numpy>=1.24.0
+pandas>=2.0.0
+netCDF4>=1.6.0
+scipy>=1.10.0
+pyyaml>=6.0
+tqdm>=4.65.0

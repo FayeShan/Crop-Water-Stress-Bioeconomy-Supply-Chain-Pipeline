@@ -1,0 +1,21 @@
+# HARM Pipeline Dependencies
+# Install: pip install -r requirements.txt
+
+# Core
+numpy>=1.24,<2.0
+pandas>=2.0
+scikit-learn>=1.3
+xgboost>=2.0
+joblib>=1.3
+
+# Config
+pyyaml>=6.0
+
+# Hyperparameter tuning (used by Global layer Optuna mode)
+optuna>=3.4
+
+# Optional: memory monitoring (used by check_memory_threshold)
+psutil>=5.9
+
+# Optional: visualization (used by evaluation/diagnostics)
+matplotlib>=3.7

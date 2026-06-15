@@ -1,0 +1,117 @@
+# GLORIA Mapping Pipeline — Configuration
+# ==========================================
+# Stage 6 of the end-to-end HARM water-stress pipeline.
+# All paths are relative to this folder (06_gloria_mapping/).
+
+general:
+  log_dir: "./logs"
+  log_level: "INFO"
+
+# ---------------------------------------------------------------
+# HARM per-crop prediction CSVs (user-supplied; output of the model
+# that was trained on data_pre/data/train and applied to
+# data_pre/data/predict). Each file:
+#   columns: time, lat, lon, y_pred
+#   pattern: {crop}.csv for each of the 27 CWS crop codes
+# ---------------------------------------------------------------
+harm_predictions:
+  # Flat per-crop {crop}.csv (time, lat, lon, year, y_pred) produced by
+  # Stage 05 `python main.py export-predictions`. Override to use your own.
+  input_dir: "../05_harm_model/results/final/predictions_csv"
+  country_csv_dir: "./data/predictions_country"   # agg-to-country output
+  shapefile: "./country_shape/ne_10m_admin_0_countries.shp"  # ships in repo (NaturalEarth 10m)
+  y_pred_column: "y_pred"
+
+# ---------------------------------------------------------------
+# Historical country-aggregated target and 175-crop historical input.
+# Both ship with the folder.
+# ---------------------------------------------------------------
+historical:
+  crops_27_csv: "./data/crops_27.csv"               # 1990-2018 country-level
+  crops_175_csv: "./reference/crops_175.csv"        # FAOSTAT 175 crops
+  years: [1990, 2018]
+
+# Output of merge-hist-pred (also shipped as a reference example)
+combined:
+  output_csv: "./data/crops_27_1990_2024.csv"
+  pred_years: [2019, 2024]
+
+# ---------------------------------------------------------------
+# Split weights for the 3 crop-27 categories (oac, pdc, pec)
+# that map to multiple GLORIA sectors.
+# ---------------------------------------------------------------
+weights:
+  rolling_csv: "./data/weights/split_weights_rolling.csv"
+  recent_csv:  "./data/weights/split_weights_recent.csv"
+  rolling_window: 5
+  recent_period: [2015, 2018]
+  split_crops: ["oac", "pdc", "pec"]
+
+# ---------------------------------------------------------------
+# Reference taxonomy look-ups (shipped with the folder).
+# ---------------------------------------------------------------
+reference:
+  crop_mapping_175_to_27_to_14: "./reference/crop_mapping_175_to_27_to_14.csv"
+  country_mapping_175_to_14:    "./reference/country_mapping_175_to_14.csv"
+  country_mapping_27_to_14:     "./reference/country_mapping_27_to_14.csv"
+  aggregate_region_mapping:     "./reference/aggregate_region_mapping.json"
+  gloria_readme:                "./reference/GLORIA_ReadMe_060.xlsx"
+
+# ---------------------------------------------------------------
+# Long-format 164 x 14 water-stress table (output of mapping-27-to-14)
+# ---------------------------------------------------------------
+mapping:
+  long_csv: "./data/water_stress_164x14_long.csv"
+  n_regions: 164
+  n_sectors_our: 14
+
+# ---------------------------------------------------------------
+# Validation of the reconstructed 14-sector satellite against the
+# GLORIA agriculture satellite (TQ row 390) over overlapping years.
+# ---------------------------------------------------------------
+validation:
+  metrics_csv:     "./data/gloria_comparison_per_year.csv"
+  composition_csv: "./data/hybrid_agriculture_composition.csv"
+  start_year: 1995
+  end_year: 2024
+
+# ---------------------------------------------------------------
+# GLORIA raw data (user-supplied — download from the GLORIA release).
+# ---------------------------------------------------------------
+gloria_raw:
+  mrio_zips_dir: "./data/gloria/mrio_zips"   # GLORIA_MRIOs_60_{year}.zip
+  sat_zips_dir:  "./data/gloria/sat_zips"    # GLORIA_SatelliteAccounts_060_{year}.zip
+
+# ---------------------------------------------------------------
+# GLORIA processed outputs.
+# ---------------------------------------------------------------
+gloria_processed:
+  mrio_unzipped_dir: "./data/gloria/mrio_unzipped"   # SUT CSVs per year
+  mrio_zarr_dir:     "./data/gloria_mrio"            # {year}.zarr
+  satellite_dir:     "./data/gloria_satellite"       # {year}/TQ_{year}.csv, YQ_{year}.csv
+
+# ---------------------------------------------------------------
+# Our satellite block + final hybrid satellite account.
+# ---------------------------------------------------------------
+satellite:
+  our_dir:    "./data/satellite"            # per-year .npy (14-sector block, m^3)
+  hybrid_dir: "./data/satellite_hybrid"     # per-year .npy (120-sector hybrid, million m^3)
+  ag_row_index:      390    # TQ row index for Agriculture water stress
+  non_ag_row_index:  391    # TQ row index for Non-agriculture water stress
+  n_sectors_gloria:  120
+  include_non_ag:    false  # if true, hybrid sectors 15-120 = ag + non-ag; else ag only (agricultural row 390 only)
+  unit_scale:        1000000.0  # our data in m^3 -> million m^3 (div by this)
+
+# Year ranges
+date_range:
+  historical_start: 1990
+  historical_end:   2018
+  predict_start:    2019
+  predict_end:      2024
+  gloria_start:     1990
+  gloria_end:       2025
+
+# Crop taxonomy (27 CWS crops; aggregate crops need split weights)
+crops:
+  all_27: [wh, ri1, ri2, mai, sor, mil, bar, soy, nut, sun, rap, bea, ckp,
+           cwp, pot, cas, vgt, sgc, sgb, cot, cof, coc, plm, aff, oac, pdc, pec]

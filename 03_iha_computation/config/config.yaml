@@ -1,0 +1,71 @@
+# iHA (Irrigated Harvested Area) Pipeline — Configuration
+# =========================================================
+# All paths are relative to this folder (03_iha_computation/).
+
+general:
+  log_dir: "./logs"
+  log_level: "INFO"
+
+# ---------------------------------------------------------------
+# Stage 0: raw data (downloaded by src/download_data.py).
+# Users who download the inputs manually can point these to any
+# location; defaults assume `python main.py download-data` has
+# been run.
+# ---------------------------------------------------------------
+data:
+  base_dir:             "./data"
+  luh2_dir:             "./data/luh2"
+  cropgrids_dir:        "./data/cropgrids/CROPGRIDSv1.08_NC_maps"
+  faostat_change:       "./data/faostat/FAOSTAT_change_2000-2023.csv"
+  faostat_change_2024:  "./data/faostat/FAOSTAT_change_2024.csv"
+
+# ---------------------------------------------------------------
+# Stage 1 (src/run_pipeline.py, "Method B"):
+#   LUH2 CFT fractions + CROPGRIDS within-CFT shares + FAOSTAT
+#   temporal scaling  →  per-crop annual harvested area (.nc per crop,
+#   0.05° grid, dims time/lat/lon, vars harvested_area, harvested_area_irrigated,
+#   harvested_area_rainfed).
+# ---------------------------------------------------------------
+output:
+  pipeline_dir: "./output"
+
+# ---------------------------------------------------------------
+# Stage 2a (src/aggregate_oac_pec_pdc.py):
+#   Per-crop annual NCs  →  aggregate categories oac / pec / pdc on
+#   the 5-arcminute (2160 × 4320) reference grid.
+# ---------------------------------------------------------------
+aggregate:
+  output_dir: "./annual"
+  categories: ["oac", "pec", "pdc"]
+
+# ---------------------------------------------------------------
+# Stage 2b (src/monthly_downscale.py):
+#   Per-crop annual NCs + ACEA crop-calendar phenology
+#   →  monthly HA on the 5-arcminute grid, per (acea_code, year).
+# ---------------------------------------------------------------
+crop_calendar:
+  dir: "./crop_calendar"
+
+monthly:
+  output_dir: "./monthly"
+  acea_crops: [
+    "wh", "ri1", "ri2", "mai", "sor", "mil", "bar",
+    "soy", "nut", "sun", "rap", "bea", "ckp", "cwp",
+    "pot", "cas", "vgt", "sgc", "sgb", "cot", "cof",
+    "coc", "plm", "aff",
+  ]
+
+# ---------------------------------------------------------------
+# Stage 3 (src/validate_vs_spam.py):
+#   Per-crop annual NCs  ⇄  SPAM2020 global harvested area for 2020.
+# ---------------------------------------------------------------
+validation:
+  spam_dir:   "./spam2020_reference"
+  output_dir: "./validation"
+
+# ---------------------------------------------------------------
+# Target grid for Stage 2 outputs (5 arcmin = 2160 × 4320).
+# ---------------------------------------------------------------
+target_grid:
+  nlat: 2160
+  nlon: 4320
