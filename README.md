@@ -1,4 +1,4 @@
-# Crop Water Stress Supply Chain Pipeline (1995, 2025)
+# Crop Water Stress Bioeconomy Supply Chain Pipeline (1995, 2024)
 
 > Code and analysis for *"Global crop water stress is locally concentrated and redistributed through the bioeconomy."*
 >
