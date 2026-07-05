@@ -18,7 +18,7 @@ The output variable is named `waterstress` in the NetCDF files and corresponds t
 
 ## Method
 
-- **Water footprint**: ACEA (AquaCrop-Earth@lternatives) monthly blue-water footprint for irrigated agriculture, at 5 arcmin (~8.3 km) global resolution. ACEA is a process-based global gridded crop model that simulates daily crop growth and the vertical soil-water balance, separating green water, blue water from capillary rise, and blue water from irrigation; the irrigation component is used here. Variable: `wfp_blue_ir`.
+- **Water footprint**: ACEA (AquaCrop-Earth@lternatives) monthly blue-water footprint for irrigated agriculture, at 5 arcmin (~9.3 km) global resolution. ACEA is a process-based global gridded crop model that simulates daily crop growth and the vertical soil-water balance, separating green water, blue water from capillary rise, and blue water from irrigation; the irrigation component is used here. Variable: `wfp_blue_ir`.
 - **Characterization factor**: AWARE
   ([Boulay et al., 2018](https://doi.org/10.1007/s11367-017-1333-8))
   monthly weights, nearest-neighbour matched onto the 5-arcmin grid.

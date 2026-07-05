@@ -8,7 +8,7 @@ Saves TWO separate single-panel figures (to be stitched later):
 Choices
 -------
 * STOCK uses a single year (2024) to match the main-text statement
-  "in 2024 ... top 10% ... 77% ... top 1% ... 27%".
+  "in 2024 ... top 10% ... 78% ... top 1% ... 28%".
 * The INCREMENT uses reference-period-only 3-year-mean endpoints
   (1995-1997 -> 2016-2018): NO predicted years, fully physically grounded,
   which avoids the >100% overshoot seen with a 2024 endpoint.

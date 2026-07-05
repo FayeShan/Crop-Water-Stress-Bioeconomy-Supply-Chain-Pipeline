@@ -7,14 +7,11 @@ ALL_CROPS = [
     'sor', 'soy', 'sun', 'vgt', 'wh',
 ]
 
-# Weighted pipeline (GW → GW+RW → Extreme on GW+RW)
-WEIGHTED_CROPS = [
-    'aff', 'bar', 'bea', 'cas', 'ckp', 'coc', 'cof', 'cot', 'cwp',
-    'mai', 'mil', 'nut', 'plm', 'pot', 'ri1', 'ri2', 'sun', 'vgt', 'wh',
-]
-
 # Unweighted pipeline (G → G+R → Extreme on G+R)
-UNWEIGHTED_CROPS = {'soy', 'sor', 'sgb', 'rap', 'sgc'}
+UNWEIGHTED_CROPS = {'soy', 'sor', 'sgb', 'rap'}
+
+# Weighted pipeline (GW → GW+RW → Extreme on GW+RW) — every crop except the unweighted set
+WEIGHTED_CROPS = [c for c in ALL_CROPS if c not in UNWEIGHTED_CROPS]
 
 # ── 30-region (Köppen) crops — use koppen data dirs ──
 KOPPEN_CROPS = {'wh', 'mai'}

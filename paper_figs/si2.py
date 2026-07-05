@@ -73,8 +73,8 @@ plt.rcParams.update({
 def load_records() -> tuple[pd.DataFrame, pd.DataFrame]:
     gloria = pd.read_csv(DATA_DIR / "gloria_agri_water_stress_by_country_yearly.csv")
     ours = pd.read_csv(DATA_DIR / "ours_icws_by_country_yearly.csv")
-    gloria = gloria.rename(columns={"value_Mm3_H2Oeq": "ws"})
-    ours = ours.rename(columns={"value_Mm3_H2Oeq": "ws"})
+    gloria = gloria.rename(columns={"value_Mm3_world_eq": "ws"})
+    ours = ours.rename(columns={"value_Mm3_world_eq": "ws"})
     gloria["source"] = "GLORIA native"
     ours["source"] = "Our record"
     # Standardise on column 'country'

@@ -110,7 +110,7 @@ features:
 # ── Global layer ──
 global_layer:
   # tuning_method is overridden by phases.{eval|final}.global_tuning_method
-  n_trials:         20
+  n_trials:         64
   n_inner_folds:    3
   n_repeats:        1
   test_months:      24

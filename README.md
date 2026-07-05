@@ -1,16 +1,27 @@
 # HARM Supply-Chain Water-Stress Pipeline
 
-> Code and analysis for *"Bioeconomy supply chains redistribute crop water stress across crops, regions and produced goods, 1995–2024."*
+> Code and analysis for *"Global crop water stress is locally concentrated and redistributed through the bioeconomy."*
 >
-> The pipeline reconstructs global crop water stress at monthly, 5-arcminute (~8.3 km) resolution for 27 crops, predicts it through 2024 with a three-layer machine-learning model, and traces how its economic responsibility is reorganized through bioeconomy supply chains.
+> The pipeline reconstructs global crop water stress at monthly, 5-arcminute (~9.3 km) resolution for 27 crops, predicts it through 2024 with a three-layer machine-learning model, and traces how its economic responsibility is reorganized through bioeconomy supply chains.
 
 ## Overview
 
 This repository contains the code and analysis behind the paper. From the abstract:
 
-> The bioeconomy is key for meeting climate targets, but also causes more than 90% of global water stress through crop irrigation in water-scarce areas. However, no global dataset currently provides quantitative, crop-resolved and temporally explicit estimates of crop water stress suitable for both local risk assessment and supply-chain attribution. We compile a physically grounded monthly reference dataset for 1995–2018 by combining crop-specific irrigation with water scarcity factors, and develop HARM (Hierarchical Additive Residual Model), a three-layer machine-learning framework that predicts global crop water stress for 27 crop categories at 5-arcminute resolution on a monthly basis during 2019–2024. HARM achieves yearly country-level R² above 0.7 for 22 crop categories, jointly accounting for 99% of modelled crop water stress. Integrating these data into an advanced multi-regional input–output framework, we find that 22% of crop water stress is embodied in interregional trade, disproportionately through fibre, oil and animal products, shifting responsibility toward consuming regions. This framework provides a basis for both targeting interventions in water-scarce hotspots and attributing water stress along bioeconomy supply chains.
+> The bioeconomy is key to climate targets, but crop irrigation for biomass production accounts for over 90% of global water stress. Yet, a global mapping of water stress that combines up-to-date, quantitative estimates with crop-resolved, temporally explicit supply chain attribution is missing. We develop a monitoring and attribution framework linking where crop water stress is generated to where it is consumed. We use a machine learning model that combines satellite, climate, and crop-specific data to predict monthly crop water stress for 27 crop categories at 5-arcminute resolution through 2024. The model reaches yearly country-level R² above 0.7 for 22 of the 27 crop categories, which together account for 94% of the global crop water stress. The resulting record shows that crop water stress is highly concentrated: 1% of irrigated cropland drives over a quarter of the 2024 total. By integrating these predictions into state-of-the-art multi-regional input–output analysis, we find that international trade accounts for 22% of global crop water stress and has grown faster than the global total since 1995. Our framework allows targeting interventions in water-scarce regions and tracing crop water stress along bioeconomy supply chains, and can be regularly updated as new observations become available.
 
 The seven-stage pipeline below reproduces this analysis end to end, from the raw environmental inputs to the supply-chain attribution.
+
+### Names in the code vs the paper
+
+The code keeps two internal names that the paper words differently; they map one-to-one:
+
+| Code / repository | Paper |
+| ----------------- | ----- |
+| **HARM** (Hierarchical Additive Residual Model) — folder `05_harm_model/`, `f_global + f_regional + f_extreme` | *a machine learning model* |
+| the model's **regional** layer — `f_regional`, the `regiontype` label, "agro-climatic regions" | the **zonal** component — agro-climatic **zones** |
+
+The code names are kept for stability; only the manuscript wording changed. Elsewhere in this README, "HARM" and "regional layer" refer to these code names.
 
 ## Pipeline overview
 
@@ -33,7 +44,7 @@ Each stage has its own `README.md` describing its inputs, outputs, configuration
 
 - **Crop water stress (CWS)** — the blue-water footprint of irrigated crop production multiplied by the basin-level AWARE characterization factor; a scarcity-weighted measure of irrigation pressure, expressed in m³ world-equivalent.
 - **AWARE** — Available WAter REmaining; the life-cycle-assessment factor that converts water consumption into a scarcity-weighted impact based on local, monthly water availability.
-- **HARM** — Hierarchical Additive Residual Model; predicts monthly CWS as an additive sum of a Global layer, a Regional residual correction and an Extreme-tail correction: `y = f_global(X) + f_regional(X) + f_extreme(X)`.
+- **HARM** — Hierarchical Additive Residual Model (the *machine learning model* of the paper); predicts monthly CWS as an additive sum of a Global layer, a Regional/zonal residual correction and an Extreme-tail correction: `y = f_global(X) + f_regional(X) + f_extreme(X)`.
 - **GLORIA** — the Global Resource Input–Output Assessment MRIO database (release 060), used to trace production-side water stress through international supply chains to final demand.
 - **Extended satellite account** — our crop water-stress vector mapped onto GLORIA's crop-growing sectors and appended as an environmental extension, enabling consumption-based and trade attribution without double counting.
 
@@ -55,11 +66,9 @@ pip install -r 03_iha_computation/requirements.txt
 
 The C++ kernel for Stage 7 is optional. See `07_gloria_mrio/README.md` for the build instructions; the numpy fallback is already fast on modern workstations.
 
-## Paper deliverables
+## Paper
 
-- `main_paper.docx` — the main paper (Abstract, Main, Results, Discussion and Methods).
-- `supplementary_methods.docx` — Supplementary Methods S1–S8 and Supplementary References.
-- `supplementary_tables/Supplementary_Tables.xlsx` — the 20 Supplementary Tables (`Table S1` through `Table S8.2`) referenced from the Methods and Supplementary Methods.
+The manuscript, Supplementary Methods and Supplementary Tables are **not** included in this repository. The paper is available from the journal and archived on Zenodo (see its *Data and code availability*). The scripts that regenerate the supplementary tables are kept under `supplementary_tables/code/`.
 
 ## Data and outputs
 
@@ -111,10 +120,8 @@ Small reference and concordance tables (AWARE source tables, FAOSTAT scaling fac
 ├── 07_gloria_mrio/
 ├── 08_final_dataset/
 │
-├── main_paper.docx
-├── supplementary_methods.docx
 └── supplementary_tables/
-    └── Supplementary_Tables.xlsx
+    └── code/                         # scripts that generate the SI tables
 ```
 
 Reviewers who want to rerun only one stage can do so by reading that stage's `README.md`; the repository is designed so that each stage's inputs are explicitly wired in its own `config/config.yaml` (or `configs/default.json` for Stage 7) and can be overridden from the command line without touching the others.

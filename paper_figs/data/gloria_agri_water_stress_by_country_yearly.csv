@@ -1,4 +1,4 @@
-year,region_idx,region_code,region_name,value_Mm3_H2Oeq
+year,region_idx,region_code,region_name,value_Mm3_world_eq
 1995,0,XAM,Rest of Americas,26891.8098931432
 1995,1,XEU,Rest of Europe,1356.3267038250199
 1995,2,XAF,Rest of Africa,378.4895463968707

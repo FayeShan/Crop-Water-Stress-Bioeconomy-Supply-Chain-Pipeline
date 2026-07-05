@@ -195,7 +195,7 @@ def concat_year_files(tmp_files, outfile, category_name, found_crops):
         'title': f'Gridded harvested area for {category_name} (aggregate)',
         'source': 'Aggregated from individual crop pipeline outputs '
                   '(LUH2-GCB2025 + CROPGRIDS v1.08 + FAOSTAT)',
-        'resolution': '5 arcminute (~9.2 km)',
+        'resolution': '5 arcminute (~9.3 km)',
         'units': 'hectares (ha)',
         'n_crops': len(CATEGORY_MAP[category_name]),
         'crops_included': ', '.join(found_crops),

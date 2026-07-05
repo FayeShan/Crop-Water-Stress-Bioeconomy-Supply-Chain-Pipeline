@@ -4,7 +4,7 @@
 
 ## Role in the pipeline
 
-Crop water stress (CWS) depends jointly on **local water scarcity** and on **where and when irrigated crop production takes place**. This stage assembles the fields that describe the physical conditions behind that picture: climate and land-surface state from ERA5-Land, vegetation condition from MODIS, soil-moisture anomalies from SMIA, and terrestrial water-storage anomalies from TWSA (GRACE/GRACE-FO). Each source is downloaded, converted to NetCDF, corrected where needed, and resampled to a common **monthly, 5-arcminute (~8.3 km) global grid** — the same grid as the crop water-stress reference dataset — so that every input aligns in space and time before modelling.
+Crop water stress (CWS) depends jointly on **local water scarcity** and on **where and when irrigated crop production takes place**. This stage assembles the fields that describe the physical conditions behind that picture: climate and land-surface state from ERA5-Land, vegetation condition from MODIS, soil-moisture anomalies from SMIA, and terrestrial water-storage anomalies from TWSA (GRACE/GRACE-FO). Each source is downloaded, converted to NetCDF, corrected where needed, and resampled to a common **monthly, 5-arcminute (~9.3 km) global grid** — the same grid as the crop water-stress reference dataset — so that every input aligns in space and time before modelling.
 
 These harmonized fields are the raw material for HARM's predictors. Together with the lagged and rolling features built from them, the irrigated harvested area added in Stage 3, and the crop water-stress target computed in Stage 2, they form the **74-variable predictor set** that the three-layer model uses to predict monthly CWS for 27 crops over 2019–2024.
 
@@ -37,6 +37,8 @@ SMIA, TWSA, and other Global Drought Observatory indicators can be downloaded ma
 | **MODIS**   | MOD13C2 v061 vegetation indices            | 0.05° × 0.05°     | 2000-present   |
 | **SMIA**    | Copernicus EDO Soil Moisture Index Anomaly | 0.1° × 0.1°       | varies         |
 | **TWSA**    | Copernicus EDO Terrestrial Water Storage Anomaly (GRACE/GRACE-FO) | ~0.25°    | 2002-present   |
+
+> **Resolution note:** SMIA is delivered at a 0.1° native resolution and processed at 0.05° before being resampled — like every source — onto the common 5-arcmin grid.
 
 ### Additional MODIS products (opt-in)
 

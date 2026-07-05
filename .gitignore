@@ -44,6 +44,11 @@ logs/
 # tutorial notebooks (e.g. 01_data_acquisition/tutorial.ipynb) are kept.
 /*.ipynb
 
+# Manuscript / paper drafts — not distributed on GitHub (advisor request).
+/*.docx
+/paperwriting/
+/Bioeconomy supply chains redistribute crop water stress_REVISED-1-1/
+
 # Large top-level data only used by paper_analyses
 /aggregated_all_years.csv
 /country/

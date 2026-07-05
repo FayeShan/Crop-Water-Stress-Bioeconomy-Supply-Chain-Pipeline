@@ -1,4 +1,4 @@
-numpy>=1.24,<2.0        # upper bound required by 05_harm_model (XGBoost compat)
+numpy>=1.24,<2.0        
 pandas>=2.0.0
 scipy>=1.10.0
 xarray>=2023.0.0

@@ -2,6 +2,8 @@
 
 > **Stage 05 of 7** in the HARM crop water-stress pipeline (see the [top-level README](../README.md)). This is the modelling core: a three-layer XGBoost model that predicts monthly crop water stress for 27 crops at 5-arcminute resolution, extending the physically grounded reference to recent years.
 
+> **Naming (code ↔ paper).** In this code the model is **HARM** (Hierarchical Additive Residual Model); the paper refers to it simply as *a machine learning model*. The **regional** layer here (`f_regional`, the `regiontype` label, `regional_layer.py`) is what the paper calls the **zonal** component — the corrections learned within agro-climatic **zones**. The code names are kept for stability.
+
 ## Role in the pipeline
 
 HARM is where the predictions are made. It takes the per-crop feature tables from Stage 04 (≈74 predictors plus the crop water-stress target), learns crop-specific relationships between environmental conditions and crop water stress (CWS), and predicts monthly CWS on the 5-arcminute grid. The physically grounded reference from Stage 02 covers 1995–2018; HARM is trained on the 2000–2018 portion of that record (the period with MODIS vegetation predictors, which begin in 2000) and is then used to extend the series to **2019–2024**. The resulting country-year CWS predictions feed the GLORIA supply-chain attribution in Stage 06.
