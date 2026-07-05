@@ -1,4 +1,4 @@
-# HARM Supply-Chain Water-Stress Pipeline
+# Crop Water Stress Supply Chain Pipeline (1995, 2025)
 
 > Code and analysis for *"Global crop water stress is locally concentrated and redistributed through the bioeconomy."*
 >
@@ -16,10 +16,10 @@ The seven-stage pipeline below reproduces this analysis end to end, from the raw
 
 The code keeps two internal names that the paper words differently; they map one-to-one:
 
-| Code / repository | Paper |
-| ----------------- | ----- |
-| **HARM** (Hierarchical Additive Residual Model) — folder `05_harm_model/`, `f_global + f_regional + f_extreme` | *a machine learning model* |
-| the model's **regional** layer — `f_regional`, the `regiontype` label, "agro-climatic regions" | the **zonal** component — agro-climatic **zones** |
+| Code / repository                                                                                                         | Paper                                                         |
+| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **HARM** (Hierarchical Additive Residual Model) — folder `05_harm_model/`, `f_global + f_regional + f_extreme` | *a machine learning model*                                  |
+| the model's**regional** layer — `f_regional`, the `regiontype` label, "agro-climatic regions"                  | the**zonal** component — agro-climatic **zones** |
 
 The code names are kept for stability; only the manuscript wording changed. Elsewhere in this README, "HARM" and "regional layer" refer to these code names.
 
@@ -30,13 +30,13 @@ The code is organised as seven sequential core stages that follow the logic of t
 | #  | Module                           | Role                                                                                                                                                                                                                                       | Main CLI                                        |
 | -- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
 | 01 | `01_data_acquisition/`         | Download the raw environmental and remote-sensing inputs (ERA5-Land, MODIS, SMIA, TWSA and related ancillary data) that drive both the water-stress target and the HARM predictors.                                                        | `python main.py …`                           |
-| 02 | `02_water_stress_computation/` | Compute the crop water-stress (CWS) target — basin-level AWARE scarcity factors × crop-specific blue-water footprints — the physically grounded quantity the rest of the pipeline reconstructs and attributes.               | `python main.py …`                           |
+| 02 | `02_water_stress_computation/` | Compute the crop water-stress (CWS) target — basin-level AWARE scarcity factors × crop-specific blue-water footprints — the physically grounded quantity the rest of the pipeline reconstructs and attributes.                          | `python main.py …`                           |
 | 03 | `03_iha_computation/`          | Reconstruct irrigated harvested-area (iHA) fields from LUH2 + CROPGRIDS + FAOSTAT (Method B); aggregate oac/pec/pdc and downscale 24 ACEA crops to monthly.                                                                                | `python main.py full-pipeline`                |
 | 04 | `04_dataset_preparation/`      | Assemble per-crop parquet feature matrices (74 predictors +`waterstress` target) from the outputs of Stages 1–3 — the training and prediction tables for HARM.                                                                         | `python main.py …`                           |
 | 05 | `05_harm_model/`               | Train and apply the HARM three-layer pipeline (Global → Regional → Extreme, with optional stress-aware weighting) in two phases:`eval` (2000–2016 train / 2017–2018 evaluate) and `final` (2000–2018 train / 2019–2024 predict). | `python main.py train/retrain/predict …`     |
 | 06 | `06_gloria_mapping/`           | Map the 27 HARM crop predictions to 14 GLORIA crop-growing sectors and construct the extended satellite account (our 14 sectors + GLORIA agriculture 15–20) used as GLORIA's environmental extension.                                     | `python main.py full-pipeline`                |
 | 07 | `07_gloria_mrio/`              | Perform the double-counting-free MRIO supply-chain analysis, using the extended satellite as the environmental extension of GLORIA v060 to attribute water stress to traded flows, consuming regions and produced goods.                   | `python run.py --config configs/default.json` |
-| 08 | `08_final_dataset/`           | Package the HARM predictions into the published gridded dataset (NetCDF, GeoTIFF, country CSV) for the Zenodo release and the Earth Engine dashboard. Branches from Stage 5; independent of the MRIO analysis.                              | `python main.py full-pipeline`                |
+| 08 | `08_final_dataset/`            | Package the HARM predictions into the published gridded dataset (NetCDF, GeoTIFF, country CSV) for the Zenodo release and the Earth Engine dashboard. Branches from Stage 5; independent of the MRIO analysis.                             | `python main.py full-pipeline`                |
 
 Each stage has its own `README.md` describing its inputs, outputs, configuration and individual CLI. This top-level README describes only the cross-stage interface and the scientific context.
 
@@ -74,12 +74,12 @@ The manuscript, Supplementary Methods and Supplementary Tables are **not** inclu
 
 Raw inputs, intermediate artefacts, and pipeline outputs are **not** stored in this repository — see the root-level `.gitignore` for the ignored directories. Each stage's `README.md` documents how to download or regenerate its data:
 
-| Stage | What the user needs to provide / download                                                                                              |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 01    | CDS API credentials (ERA5), NASA EarthData login (MODIS); Stage 01 handles the rest.                                                   |
-| 03    | LUH2 state/management NCs, CROPGRIDS v1.08 per-crop NCs, FAOSTAT QCL (the Stage 03 `download-data` sub-command automates these).     |
+| Stage | What the user needs to provide / download                                                                                                |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 01    | CDS API credentials (ERA5), NASA EarthData login (MODIS); Stage 01 handles the rest.                                                     |
+| 03    | LUH2 state/management NCs, CROPGRIDS v1.08 per-crop NCs, FAOSTAT QCL (the Stage 03`download-data` sub-command automates these).        |
 | 06    | GLORIA v060 satellite-account zips from[https://ielab.info/resources/gloria](https://ielab.info/resources/gloria) (30 files, 1995–2024). |
-| 07    | Only needs Stage 6 outputs; nothing external.                                                                                          |
+| 07    | Only needs Stage 6 outputs; nothing external.                                                                                            |
 
 Once all inputs are in place, the full end-to-end pipeline can be reproduced by running each stage's main CLI in order (Stages 01 → 07).
 
@@ -87,19 +87,19 @@ Once all inputs are in place, the full end-to-end pipeline can be reproduced by 
 
 Because of their size, the raw inputs, intermediate artefacts and pipeline outputs listed below are **not uploaded to GitHub** (they are excluded via the root `.gitignore`). Each item can be regenerated by running the corresponding stage from the public sources noted; the headline datasets — the gridded crop water-stress product and the MRIO attribution results — are archived on Zenodo (see *Data availability* in the paper). The full set of intermediate files is also **available from the corresponding author on request**.
 
-| Stage | Excluded path | Contents | Approx. size | How to obtain |
-| ----- | ------------- | -------- | ------------ | ------------- |
-| 01 | `01_data_acquisition/data/` | Raw ERA5-Land / MODIS / SMIA / TWSA downloads, merged per-year predictor NCs, and the `reference/2002.nc` grid template | ~0.7 GB+ | Re-download via Stage 01 CLI (needs CDS + NASA EarthData credentials); or on request |
-| 02 | `02_water_stress_computation/aware/aware_gridcell.nc` | Pre-gridded monthly AWARE characterization weights | 854 MB | Rebuild with `src/build_aware_grid.py` from the shipped `AWARE.xlsx`; or on request |
-| 02 | `02_water_stress_computation/wf/`, `waterstress/` | ACEA blue-water-footprint inputs; computed CWS reference NCs | large | ACEA inputs from 4TU.ResearchData (Mialyk et al. 2024); outputs regenerated by `compute-ws` |
-| 03 | `03_iha_computation/data/luh2/`, `data/cropgrids/` | LUH2 (8.3 GB) and CROPGRIDS v1.08 (0.9 GB) raw inputs | ~9 GB | `python main.py download-data` (Zenodo / Figshare) |
-| 03 | `03_iha_computation/output/`, `annual/`, `monthly/` | Regenerated annual + monthly irrigated-harvested-area NCs | ~46 GB | Regenerated by `python main.py full-pipeline` |
-| 03 | `03_iha_computation/spam2020_reference/` | SPAM2020 V2r0 validation rasters | 4.8 GB | IFPRI Harvard Dataverse `10.7910/DVN/SWPENT` |
-| 04 | `04_dataset_preparation/data/` | Assembled per-crop train / predict feature parquets | large | Regenerated by Stage 04 `full-pipeline` |
-| 05 | `05_harm_model/data/`, `results/` | HARM inputs (Köppen variants, masks, shapefile) and trained models + predictions | large | Regenerated by Stage 05 `train` / `retrain` / `predict` |
-| 06 | `06_gloria_mapping/data/gloria/`, `gloria_satellite/`, `gloria_mrio/` | GLORIA v060 release zips and unpacked satellite / MRIO tables | ~15 GB+ | GLORIA v060 from [ielab.info/resources/gloria](https://ielab.info/resources/gloria) |
-| 06 | `06_gloria_mapping/data/satellite/`, `satellite_hybrid/` | Regenerated 14-sector and hybrid satellite blocks | small–medium | Regenerated by Stage 06 |
-| 07 | `07_gloria_mrio/output/` | MRIO attribution result arrays | large | Regenerated by `python run.py`; headline results on Zenodo |
+| Stage | Excluded path                                                               | Contents                                                                                                                 | Approx. size  | How to obtain                                                                                |
+| ----- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------- | -------------------------------------------------------------------------------------------- |
+| 01    | `01_data_acquisition/data/`                                               | Raw ERA5-Land / MODIS / SMIA / TWSA downloads, merged per-year predictor NCs, and the`reference/2002.nc` grid template | ~0.7 GB+      | Re-download via Stage 01 CLI (needs CDS + NASA EarthData credentials); or on request         |
+| 02    | `02_water_stress_computation/aware/aware_gridcell.nc`                     | Pre-gridded monthly AWARE characterization weights                                                                       | 854 MB        | Rebuild with`src/build_aware_grid.py` from the shipped `AWARE.xlsx`; or on request       |
+| 02    | `02_water_stress_computation/wf/`, `waterstress/`                       | ACEA blue-water-footprint inputs; computed CWS reference NCs                                                             | large         | ACEA inputs from 4TU.ResearchData (Mialyk et al. 2024); outputs regenerated by`compute-ws` |
+| 03    | `03_iha_computation/data/luh2/`, `data/cropgrids/`                      | LUH2 (8.3 GB) and CROPGRIDS v1.08 (0.9 GB) raw inputs                                                                    | ~9 GB         | `python main.py download-data` (Zenodo / Figshare)                                         |
+| 03    | `03_iha_computation/output/`, `annual/`, `monthly/`                   | Regenerated annual + monthly irrigated-harvested-area NCs                                                                | ~46 GB        | Regenerated by`python main.py full-pipeline`                                               |
+| 03    | `03_iha_computation/spam2020_reference/`                                  | SPAM2020 V2r0 validation rasters                                                                                         | 4.8 GB        | IFPRI Harvard Dataverse`10.7910/DVN/SWPENT`                                                |
+| 04    | `04_dataset_preparation/data/`                                            | Assembled per-crop train / predict feature parquets                                                                      | large         | Regenerated by Stage 04`full-pipeline`                                                     |
+| 05    | `05_harm_model/data/`, `results/`                                       | HARM inputs (Köppen variants, masks, shapefile) and trained models + predictions                                        | large         | Regenerated by Stage 05`train` / `retrain` / `predict`                                 |
+| 06    | `06_gloria_mapping/data/gloria/`, `gloria_satellite/`, `gloria_mrio/` | GLORIA v060 release zips and unpacked satellite / MRIO tables                                                            | ~15 GB+       | GLORIA v060 from[ielab.info/resources/gloria](https://ielab.info/resources/gloria)            |
+| 06    | `06_gloria_mapping/data/satellite/`, `satellite_hybrid/`                | Regenerated 14-sector and hybrid satellite blocks                                                                        | small–medium | Regenerated by Stage 06                                                                      |
+| 07    | `07_gloria_mrio/output/`                                                  | MRIO attribution result arrays                                                                                           | large         | Regenerated by`python run.py`; headline results on Zenodo                                  |
 
 Small reference and concordance tables (AWARE source tables, FAOSTAT scaling factors, crop calendars, crop/region concordances, GLORIA documentation, the country shapefile, and example aggregated CSVs) **are** included, so the mapping and attribution steps can be inspected and rerun without the bulk data.
 
