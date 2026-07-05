@@ -2,7 +2,7 @@
 
 > Code and analysis for *"Global crop water stress is locally concentrated and redistributed through the bioeconomy."*
 >
-> The pipeline reconstructs global crop water stress at monthly, 5-arcminute (~9.3 km) resolution for 27 crops, predicts it through 2024 with a three-layer machine-learning model, and traces how its economic responsibility is reorganized through bioeconomy supply chains.
+> The pipeline reconstructs global crop water stress at monthly, 5-arcminute (~9.3 km) resolution for 27 crops, predicts it through 2024 with a three-layer machine-learning model, and traces how crop water stress is redistributed through bioeconomy supply chains from production to final consumption .
 
 ## Overview
 
@@ -25,7 +25,7 @@ The code names are kept for stability; only the manuscript wording changed. Else
 
 ## Pipeline overview
 
-The code is organised as seven sequential core stages that follow the logic of the paper, plus a packaging stage (08). Stages 1–4 build the physical foundation: they download the environmental and remote-sensing inputs, compute the scarcity-weighted CWS target, reconstruct irrigated harvested area, and assemble per-crop feature matrices. Stage 5 is the modelling core, where HARM learns crop-specific relationships and predicts monthly CWS through 2024. Stages 6–7 make the supply-chain connection: they map the 27-crop predictions onto the GLORIA crop-growing sectors as an extended environmental satellite account, then perform the double-counting-free MRIO analysis that attributes water stress across producing regions, traded flows, consuming regions and final goods. Stage 8 branches from Stage 5 to compile the predictions into the published NetCDF, GeoTIFF and country-CSV dataset (the Zenodo release and the Earth Engine dashboard), independently of the MRIO analysis.
+The code is organised as seven sequential core stages that follow the logic of the paper, plus a packaging stage (08). Stages 1–4 build the physical foundation: they download the environmental and remote-sensing inputs, compute the scarcity-weighted CWS target, reconstruct irrigated harvested area, and assemble per-crop feature matrices. Stage 5 is the modelling core, where HARM learns crop-specific relationships and predicts monthly CWS through 2024. Stages 6–7 make the supply-chain connection: they map the 27-crop predictions onto the GLORIA crop-growing sectors as an extended environmental satellite account, then perform the MRIO analysis without double counting that attributes water stress across producing regions, traded flows, consuming regions and final goods. Stage 8 branches from Stage 5 to compile the predictions into the published NetCDF, GeoTIFF and country-CSV dataset (the Zenodo release and the Earth Engine dashboard), independently of the MRIO analysis.
 
 | #  | Module                           | Role                                                                                                                                                                                                                                       | Main CLI                                        |
 | -- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
