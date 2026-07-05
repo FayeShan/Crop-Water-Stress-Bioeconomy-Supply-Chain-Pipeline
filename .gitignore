@@ -49,6 +49,10 @@ logs/
 /paperwriting/
 /Bioeconomy supply chains redistribute crop water stress_REVISED-1-1/
 
+# Stray copy of the GLORIA release notes at the repo root — not redistributed
+# (the canonical reference copy stays in 06_gloria_mapping/reference/).
+/GLORIA_ReleaseNotes_060*.pdf
+
 # Large top-level data only used by paper_analyses
 /aggregated_all_years.csv
 /country/
