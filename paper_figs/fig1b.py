@@ -23,8 +23,8 @@ ZOOM_REGIONS = [
     (44, 64, 25, 40, "Iran",                  "#42A5F5"),
 ]
 
-# multiple year average
-def compute_change(ds, year_end=2024, year_start=1995, avg_years=3):
+# multiple year average: here we only choose one year
+def compute_change(ds, year_end=2024, year_start=1995, avg_years=1):
     """
     Compute absolute change between two periods.
 
